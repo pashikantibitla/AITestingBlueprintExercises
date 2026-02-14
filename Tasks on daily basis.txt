@@ -1,0 +1,31 @@
+Tasks 
+
+fTask Feb 1st
+Scenario: You need to test a "Add to Cart" feature.
+
+Given Information:
+Users can add products to cart
+Maximum 10 items per product
+Cart shows total price
+=================================
+
+Task 24th Jan 2026 
+Develop the Local TESTcase Gen(Ollama API)
+=======================================================
+
+Task 31st Jan 2026 | Create the Selenium FW RICE POT
+Task 31st Jan 2026 | Play with GROQ API
+Task 31st Jan 2026 | Write a complete QA prompt using the RICE POT framework.
+
+========================================================
+Test Plan creator with your own test plan
+create resume creator generator with skill
+create simple linkedin post generator with skill
+create tweet
+create skill which review the code selenium with java 
+Selenium To Playwright Converter
+skill creator
+
+
+
+Task 24th Jan 2026 | Develop the Local TESTcase Gen(Ollama API)

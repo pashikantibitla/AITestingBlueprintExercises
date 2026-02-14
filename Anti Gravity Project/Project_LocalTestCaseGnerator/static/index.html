@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.L.A.S.T. | Local Test Case Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="glass-container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <span>B.L.A.S.T. <span>TestGen</span></span>
+            </div>
+            <div class="header-right">
+                <div class="model-selection">
+                    <select id="model-select" title="Choose Model">
+                        <option value="llama3.2">llama3.2</option>
+                    </select>
+                </div>
+                <div class="status-indicator">
+                    <div id="ollama-status" class="status-dot disconnected"></div>
+                    <span id="status-text">Ollama: Disconnected</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="chat-area" id="chat-messages">
+            <div class="message system">
+                <div class="avatar"><i class="fas fa-robot"></i></div>
+                <div class="content">
+                    <p>Hello! I'm your local QA Assistant. Describe a feature or requirement, and I'll generate
+                        comprehensive test cases using <strong>llama3.2</strong>.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="input-area">
+            <div class="input-wrapper">
+                <textarea id="user-input" placeholder="Enter feature description (e.g., User Login with MFA)..."
+                    rows="1"></textarea>
+                <button id="send-btn" title="Generate Test Cases">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="footer-meta">
+                Powered by Ollama & Llama 3.2 • Local & Private
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
