@@ -4,7 +4,3 @@ Aqua-Clip_media-downloader.exe
 node_modules/
 .DS_Store
 Thumbs.db
-
-Grog API key.txt
-
-*.mp4
