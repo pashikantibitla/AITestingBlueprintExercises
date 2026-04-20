@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "calculator": {
+      "name": "Calculator",
+      "description": "A simple MCP calculator server with add, subtract, multiply, divide tools and resources",
+      "transport": "stdio",
+      "command": "fastmcp",
+      "args": [
+        "run",
+        "helloworldcalculator.py"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--dns-result-order=ipv4first"
+      },
+      "workingDirectory": "D:\\AI testing blueprint\\project_20_MCP_exercises"
+    }
+  }
+}
