@@ -7,7 +7,7 @@
       "command": "fastmcp",
       "args": [
         "run",
-        "helloworldcalculator.py"
+        "src/01_helloworldcalculator.py"
       ],
       "env": {
         "NODE_OPTIONS": "--dns-result-order=ipv4first"

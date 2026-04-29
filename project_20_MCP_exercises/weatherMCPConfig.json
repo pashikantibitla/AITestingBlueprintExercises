@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "weather": {
+      "name": "Weather",
+      "description": "MCP Weather server powered by wttr.in. Provides current weather data for any city including temperature, condition, humidity, wind, and feels-like temp.",
+      "transport": "stdio",
+      "command": "fastmcp",
+      "args": [
+        "run",
+        "src/02_weather_MCP.py"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--dns-result-order=ipv4first",
+        "WEATHER_API_KEY": ""
+      },
+      "workingDirectory": "D:\\AI testing blueprint\\project_20_MCP_exercises"
+    }
+  }
+}
