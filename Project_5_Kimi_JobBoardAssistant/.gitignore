@@ -1,0 +1,6 @@
+Aqua-Clip_media-downloader.exe
+*.exe
+.vscode/
+node_modules/
+.DS_Store
+Thumbs.db

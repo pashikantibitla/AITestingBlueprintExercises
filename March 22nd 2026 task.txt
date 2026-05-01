@@ -1,0 +1,25 @@
+Smart Bug Triage ( JIRA MCP) + UI
+
+JIRA you need to fetch all the JIRA bugs, uses AI to auto-classify, prioritize, and assign bugs (create a random list of dev, assign based on the role that they have)
+
+JIRA ID - app.vwo.com login page is not working with API, → Pramod → Software Backend Develop with P0 Pririty
+
+UI  - Fetch the JIRA Ticket, and Based in the list of devs it will assign the ticket. 
+
+
+———-
+https://bugzz.atlassian.net/
+
+—— 
+
+RCA Agent -  ( Fetch all the JIRA Tickets, If prod ticket )
+
+Create Ticket → RCA → JIRA ID → Title RCA, Create a RCA by using the AI.
+https://sdet.dorik.io/rca
+
+
+Create an Anetek flow or Langflow, whichever. 
+
+Fetch all the tickets. Fetch tickets one by one. Check the tickets every hour. If the ticket contains RCA, create an RCA based on tab. 
+
+——

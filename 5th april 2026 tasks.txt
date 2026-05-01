@@ -1,0 +1,67 @@
+https://katalon-demo-cura.herokuapp.com/
+
+
+[Task] #1 - Assignment 1 — Test Case Generator Crew (Level: Beginner
+====================================================================
+You are given a feature requirement as plain text input (e.g., "User Registration with Email Verification"). 
+
+Build a CrewAI crew with two agents working in a sequential process. 
+
+
+Agent 1 is a "Requirements Analyst" who reads the feature requirement and breaks it down into testable scenarios covering positive, negative, and edge cases. 
+
+Agent 2 is a "Test Case Writer" who takes those scenarios and writes detailed test cases with test ID, title, pre-conditions, steps, expected result, and priority (P0–P4). 
+
+The crew should accept any feature requirement string as input via crew.kickoff(inputs={"feature": "..."}) and produce the final test cases. 
+
+Use Groq or OpenAI as your LLM. 
+
+Write at least 3 pytest tests that validate your agent roles are configured correctly and your crew has exactly 2 agents running sequentially. 
+
+Save the final output to a file using the output_file parameter on the last task.
+
+
+
+[Task] #2 - Flaky Test Investigator Crew (Level: Intermediate)
+==============================================================
+Build a CrewAI crew with three agents that investigates flaky tests in a CI/CD pipeline. 
+
+Agent 1 is a "Flaky Test Detector" that receives a list of test names with their pass/fail history over the last 10 runs (you will create a custom @tool that returns mock data — a dictionary of test names mapped to a list of pass/fail booleans). This agent identifies which tests are flaky (passed and failed in the same window). 
+
+Agent 2 is a "Root Cause Analyst" that takes the flaky tests identified and hypothesizes why each test is flaky (timing issues, shared state, environment dependency, test data pollution, etc.). 
+
+Agent 3 is a "Fix Recommender" that produces a concrete action plan for each flaky test — what to fix, how to stabilize it, and whether to quarantine it. Use the context parameter so each task feeds into the next. 
+
+
+Create at least 2 custom tools (the test history tool and a mock "get test source code" tool). Define a Pydantic model FlakyTestReport with fields for test_name, flakiness_rate, probable_cause, recommended_action, and quarantine (bool), and use output_json on the final task. 
+
+Write pytest tests for both your custom tools and your agent configurations.
+
+
+[Task] #3 - API Health Check War Room (Level: Advanced)
+
+=========================================================
+Build a CrewAI crew that simulates a QA war room responding to an API health degradation incident. 
+
+The crew has four agents. 
+
+Agent 1 is an "Incident Classifier" who receives an alert payload (JSON string with endpoint, error_rate, latency_p99, status_codes, and affected_users count) and classifies the incident severity using the P0–P4 scale. 
+
+Agent 2 is an "API Test Strategist" who designs an immediate smoke test plan — which endpoints to hit, what assertions to check, what headers/payloads to send — written as pseudocode that mirrors Playwright API testing syntax (apiContext.get(), expect(response).toBeOK()). 
+
+Agent 3 is a "Blast Radius Analyst" who determines which downstream services, user flows, and scheduled jobs are impacted (use a custom @tool that returns a mock service dependency map). 
+
+Agent 4 is a "Incident Commander" who synthesizes all three outputs into a single incident report with severity, blast radius, immediate actions, test plan, and communication draft for stakeholders. 
+
+Use Process.sequential with proper context chaining across all four tasks. Create at least 3 custom tools (alert parser, dependency map, recent deployment history). 
+
+Define two Pydantic models — IncidentClassification and IncidentReport — and use output_json on Tasks 1 and 4 respectively. 
+
+Write a full pytest test suite: unit tests for all tools, configuration tests for all agents, and one integration test (marked @pytest.mark.slow) that runs the complete crew against a sample alert payload and asserts the output contains a severity level and at least one recommended action.
+
+
+
+
+
+
+

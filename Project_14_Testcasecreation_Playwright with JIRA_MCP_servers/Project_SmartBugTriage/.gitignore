@@ -1,7 +1,29 @@
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
 
-.vercel
+# Build
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Encrypted credentials - NEVER commit
+config/.jira-credentials.enc
+scripts/encrypt-credentials.js
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

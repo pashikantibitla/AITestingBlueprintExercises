@@ -1,0 +1,23 @@
+{
+    "command": "fastmcp",
+    "args": [
+        "run",
+        "02_weather_MCP.py",
+        "--no-banner",
+        "--reload"
+    ],
+    "env": {
+        "APPDATA": "C:\\Users\\pashi\\AppData\\Roaming",
+        "HOMEDRIVE": "C:",
+        "HOMEPATH": "\\Users\\pashi",
+        "LOCALAPPDATA": "C:\\Users\\pashi\\AppData\\Local",
+        "PATH": "C:\\Users\\pashi\\AppData\\Local\\npm-cache\\_npx\\5a9d879542beca3a\\node_modules\\.bin;D:\\AI testing blueprint\\project_20_MCP_exercises\\src\\node_modules\\.bin;D:\\AI testing blueprint\\project_20_MCP_exercises\\node_modules\\.bin;D:\\AI testing blueprint\\node_modules\\.bin;D:\\node_modules\\.bin;C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\@npmcli\\run-script\\lib\\node-gyp-bin;c:\\Users\\pashi\\AppData\\Roaming\\Antigravity\\User\\globalStorage\\moonshot-ai.kimi-code\\bin\\kimi\\_internal\\pywin32_system32;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\dotnet\\;\"C:\\Program Files\\Java\\jdk1.8.0_361\\bin;\";C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin;C:\\Program Files\\Python311\\python.exe;C:\\Program Files\\Python311;C:\\Program Files\\Python311\\Scripts;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs\\;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Users\\pashi\\AppData\\Roaming\\Python\\Python311\\Scripts;C:\\Program Files\\MySQL\\MySQL Shell 8.0\\bin\\;C:\\Users\\pashi\\AppData\\Local\\Microsoft\\WindowsApps;;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2023.1.2\\bin;;C:\\Program Files\\JetBrains\\PyCharm Community Edition 2023.1.2\\bin;;C:\\Users\\pashi\\AppData\\Local\\Programs\\Ollama;C:\\Users\\pashi\\AppData\\Local\\Programs\\Antigravity\\bin;C:\\Users\\pashi\\AppData\\Roaming\\npm;D:\\Microsoft VS Code\\bin",
+        "PROCESSOR_ARCHITECTURE": "AMD64",
+        "SYSTEMDRIVE": "C:",
+        "SYSTEMROOT": "C:\\WINDOWS",
+        "TEMP": "C:\\Users\\pashi\\AppData\\Local\\Temp",
+        "USERNAME": "pashi",
+        "USERPROFILE": "C:\\Users\\pashi",
+        "PROGRAMFILES": "C:\\Program Files"
+    }
+}

@@ -1,13 +1,94 @@
-Aqua-Clip_media-downloader.exe
+# Logs
+*.log
+logs/
+log/
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+
+# Documents
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.csv
+*.pdf
+
+# Executables and archives
 *.exe
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# IDE and OS files
 .vscode/
 node_modules/
 .DS_Store
 Thumbs.db
+.idea/
+__pycache__/
+*.pyc
 
-Grog API key.txt
-Grog API key_1.txt
-Backup-codes-ammi8493.txt
+# Virtual environments
+venv/
+.env/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Security and credentials - specific files
+.env
+!*.env.example
+!*.env.template
+Backup-codes*
+Grog API key*
 google client and secret doc.json
 
+# n8n secrets
+Project8_Node_n8n/LinkedinProfilecredentials.json
+Project8_Node_n8n/googlesecretgooglesheet.json
+Project8_Node_n8n/sheetdocsecretcode.json
+Project8_Node_n8n/AgentToGenerateIssueInJIRA.json
+Project8_Node_n8n/Sample.json
+
+# Build outputs
+dist/
+build/
+.vercel/
+.tmp/
+
+# Encrypted files & keys
+*.enc
+encryption.key
+encrypt_sensitive_files.py
+
+# Media
 *.mp4
+*.mov
+*.avi
+*.wmv
+*.mkv
+
+Langflow .txt
+Langflow .txt.bak
+*.bak
+
+openclaw installation.txt
+
+project_19_CREWAI_sample_project/crew_AI_Exercise/03_building_a_bugTriage_agent.py
+project_19_CREWAI_sample_project/crew_AI_Exercise/05_FETCH_JIRA_CREATE_TEST_PLAN_AI_AGENT.py
+project_19_CREWAI_sample_project/crew_AI_Exercise/06_FETCH_JIRA_CREATE_TEST_PLAN_AI_AGENT_Add_Memory.py
+

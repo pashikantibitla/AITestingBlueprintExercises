@@ -1,0 +1,13 @@
+Build an Advanced RAG-based project with UI as per the below requirements:
+
+1) Generate 500 test cases
+
+2) Store these test cases in a RAG system
+
+3) Generate new test cases using a JIRA ticket input
+
+4) Display the generated test cases in a UI using RAG
+
+5) Integrate and call Langflow as part of the solution
+
+🎯 Objective: Create a complete working flow from test case generation → storage → retrieval → UI display.

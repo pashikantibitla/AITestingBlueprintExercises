@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bug Triage Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            critical: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' },
+            high: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' },
+            medium: { 50: '#fefce8', 100: '#fef9c3', 500: '#eab308', 600: '#ca8a04', 700: '#a16207' },
+            low: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' },
+            p0: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#dc2626' },
+            p1: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c' },
+            p2: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
+            p3: { 50: '#f9fafb', 100: '#f3f4f6', 500: '#6b7280', 600: '#4b5563' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .card-hover { transition: all 0.2s ease; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 4px 10px -5px rgba(0,0,0,0.04); }
+    .expand-icon { transition: transform 0.2s ease; }
+    .expanded .expand-icon { transform: rotate(180deg); }
+    .detail-row { border-left: 3px solid transparent; }
+    .criteria-list li { position: relative; padding-left: 1.25rem; }
+    .criteria-list li::before { content: "✓"; position: absolute; left: 0; color: #16a34a; font-weight: bold; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">BT</div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900 tracking-tight">Bug Triage Dashboard</h1>
+            <p class="text-xs text-gray-500">CrewAI-powered intelligent bug analysis</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-sm text-gray-500">Updated: Apr 19, 2026</span>
+          <button class="bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+            + New Triage
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Stats Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+      <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Bugs</p>
+        <p class="text-2xl font-bold text-gray-900 mt-1">3</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Critical</p>
+        <p class="text-2xl font-bold text-critical-600 mt-1">1</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">High</p>
+        <p class="text-2xl font-bold text-high-600 mt-1">1</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Medium</p>
+        <p class="text-2xl font-bold text-medium-600 mt-1">1</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">P0 / P1</p>
+        <p class="text-2xl font-bold text-p0-600 mt-1">2</p>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Effort</p>
+        <p class="text-2xl font-bold text-gray-900 mt-1">26h</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="text-sm font-medium text-gray-700">Filters:</span>
+        <button onclick="filterBugs('all')" class="filter-btn active px-3 py-1.5 rounded-full text-xs font-medium bg-gray-900 text-white transition-all" data-filter="all">All</button>
+        <button onclick="filterBugs('Critical')" class="filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-critical-100 hover:text-critical-700 transition-all" data-filter="Critical">Critical</button>
+        <button onclick="filterBugs('High')" class="filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-high-100 hover:text-high-700 transition-all" data-filter="High">High</button>
+        <button onclick="filterBugs('Medium')" class="filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-medium-100 hover:text-medium-700 transition-all" data-filter="Medium">Medium</button>
+        <button onclick="filterBugs('P0')" class="filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-p0-100 hover:text-p0-700 transition-all" data-filter="P0">P0</button>
+        <button onclick="filterBugs('P1')" class="filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-p1-100 hover:text-p1-700 transition-all" data-filter="P1">P1</button>
+        <button onclick="filterBugs('P2')" class="filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-p2-100 hover:text-p2-700 transition-all" data-filter="P2">P2</button>
+      </div>
+    </div>
+
+    <!-- Bug Cards -->
+    <div id="bug-container" class="space-y-5">
+      <!-- Bug 1 -->
+      <article class="bug-card bg-white rounded-xl border border-gray-200 shadow-sm card-hover" data-severity="High" data-priority="P1">
+        <div class="p-6">
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-mono font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">BT-001</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-high-100 text-high-700 border border-high-200">High</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-p1-100 text-p1-700 border border-p1-200">P1</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">Users unable to complete checkout after adding promo code</h3>
+            </div>
+            <button onclick="toggleCard(this)" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+              <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+
+          <!-- Meta Row -->
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-sm text-gray-600">
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Sep 16, 2024</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <span class="font-medium text-gray-900">Frontend</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <span class="font-medium text-gray-900">Emily Patel</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+              <span class="px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">UI</span>
+            </div>
+          </div>
+
+          <!-- Expanded Details -->
+          <div class="details-panel hidden mt-5 pt-5 border-t border-gray-100">
+            <!-- Effort & Action Bar -->
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="bg-gray-50 rounded-lg px-4 py-2.5 flex items-center gap-3 border border-gray-100">
+                <div class="text-center">
+                  <p class="text-[10px] text-gray-500 uppercase tracking-wider">QA Effort</p>
+                  <p class="text-base font-bold text-gray-900">4h</p>
+                </div>
+                <div class="w-px h-6 bg-gray-300"></div>
+                <div class="text-center">
+                  <p class="text-[10px] text-gray-500 uppercase tracking-wider">Dev Effort</p>
+                  <p class="text-base font-bold text-gray-900">8h</p>
+                </div>
+              </div>
+              <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">Immediate Fix</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+              <!-- Description -->
+              <div class="detail-row pl-4 border-l-blue-400">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Bug Description</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">Users are unable to complete the checkout process after applying a valid promo code, as the "Place Order" button becomes unresponsive. This issue occurs on multiple browsers and persists even after clearing the cache.</p>
+              </div>
+              <!-- RCA -->
+              <div class="detail-row pl-4 border-l-purple-400">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Root Cause Analysis</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">The issue might be related to a JavaScript error triggered by the promo code application, possibly due to a recent update in the frontend codebase.</p>
+              </div>
+            </div>
+
+            <!-- Business Impact -->
+            <div class="mt-5 bg-orange-50 rounded-lg p-4 border border-orange-100">
+              <h4 class="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Business Impact
+              </h4>
+              <p class="text-sm text-gray-700 leading-relaxed">This bug directly affects revenue as users are unable to complete their purchases, leading to potential loss of sales and customer dissatisfaction.</p>
+            </div>
+
+            <!-- Acceptance Criteria -->
+            <div class="mt-5 bg-green-50 rounded-lg p-4 border border-green-100">
+              <h4 class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Acceptance Criteria / Fix Criteria
+              </h4>
+              <ul class="criteria-list text-sm text-gray-700 space-y-1.5">
+                <li>The "Place Order" button is responsive after applying a valid promo code.</li>
+                <li>The checkout process completes successfully without errors.</li>
+                <li>The issue is resolved across all supported browsers (Chrome, Firefox, Safari, Edge).</li>
+                <li>No error messages are displayed unnecessarily.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Bug 2 -->
+      <article class="bug-card bg-white rounded-xl border border-gray-200 shadow-sm card-hover" data-severity="Medium" data-priority="P2">
+        <div class="p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-mono font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">BT-002</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-medium-100 text-medium-700 border border-medium-200">Medium</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-p2-100 text-p2-700 border border-p2-200">P2</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">API response time exceeds 10 seconds for product search</h3>
+            </div>
+            <button onclick="toggleCard(this)" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+              <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-sm text-gray-600">
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Sep 17, 2024</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <span class="font-medium text-gray-900">Backend</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <span class="font-medium text-gray-900">Jordan Smith</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+              <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700">Performance</span>
+            </div>
+          </div>
+
+          <div class="details-panel hidden mt-5 pt-5 border-t border-gray-100">
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="bg-gray-50 rounded-lg px-4 py-2.5 flex items-center gap-3 border border-gray-100">
+                <div class="text-center">
+                  <p class="text-[10px] text-gray-500 uppercase tracking-wider">QA Effort</p>
+                  <p class="text-base font-bold text-gray-900">6h</p>
+                </div>
+                <div class="w-px h-6 bg-gray-300"></div>
+                <div class="text-center">
+                  <p class="text-[10px] text-gray-500 uppercase tracking-wider">Dev Effort</p>
+                  <p class="text-base font-bold text-gray-900">12h</p>
+                </div>
+              </div>
+              <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">Next Sprint</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+              <div class="detail-row pl-4 border-l-blue-400">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Bug Description</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">The product search API endpoint is taking over 10 seconds to respond to generic search terms, causing timeouts on the mobile app and potentially degrading the user experience.</p>
+              </div>
+              <div class="detail-row pl-4 border-l-purple-400">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Root Cause Analysis</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">The slow response time could be due to inefficient database queries or inadequate indexing, possibly exacerbated by a large volume of products or unoptimized search algorithms.</p>
+              </div>
+            </div>
+
+            <div class="mt-5 bg-orange-50 rounded-lg p-4 border border-orange-100">
+              <h4 class="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Business Impact
+              </h4>
+              <p class="text-sm text-gray-700 leading-relaxed">Slow API response times can lead to a poor user experience, potentially driving customers away and affecting the company's reputation for reliability and speed.</p>
+            </div>
+
+            <div class="mt-5 bg-green-50 rounded-lg p-4 border border-green-100">
+              <h4 class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Acceptance Criteria / Fix Criteria
+              </h4>
+              <ul class="criteria-list text-sm text-gray-700 space-y-1.5">
+                <li>The API response time for product search queries is under 2 seconds.</li>
+                <li>The improvement is consistent across different search terms and query parameters.</li>
+                <li>The fix does not introduce any new errors or affect existing functionality.</li>
+                <li>Performance is optimized without compromising on the quality of search results.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Bug 3 -->
+      <article class="bug-card bg-white rounded-xl border border-gray-200 shadow-sm card-hover" data-severity="Critical" data-priority="P0">
+        <div class="p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-mono font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">BT-003</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-critical-100 text-critical-700 border border-critical-200">Critical</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-p0-100 text-p0-700 border border-p0-200">P0</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">Sensitive user data visible in browser console logs</h3>
+            </div>
+            <button onclick="toggleCard(this)" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+              <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mt-4 text-sm text-gray-600">
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Sep 18, 2024</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <span class="font-medium text-gray-900">Security</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <span class="font-medium text-gray-900">Priya Sharma</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+              <span class="px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700">Security</span>
+            </div>
+          </div>
+
+          <div class="details-panel hidden mt-5 pt-5 border-t border-gray-100">
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="bg-gray-50 rounded-lg px-4 py-2.5 flex items-center gap-3 border border-gray-100">
+                <div class="text-center">
+                  <p class="text-[10px] text-gray-500 uppercase tracking-wider">QA Effort</p>
+                  <p class="text-base font-bold text-gray-900">2h</p>
+                </div>
+                <div class="w-px h-6 bg-gray-300"></div>
+                <div class="text-center">
+                  <p class="text-[10px] text-gray-500 uppercase tracking-wider">Dev Effort</p>
+                  <p class="text-base font-bold text-gray-900">4h</p>
+                </div>
+              </div>
+              <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">Immediate Fix</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+              <div class="detail-row pl-4 border-l-blue-400">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Bug Description</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">Sensitive user data, including full credit card numbers and API keys, is being printed in the browser's developer console when navigating to the user profile page, indicating a serious security vulnerability.</p>
+              </div>
+              <div class="detail-row pl-4 border-l-purple-400">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Root Cause Analysis</h4>
+                <p class="text-sm text-gray-700 leading-relaxed">The issue is likely due to leftover debug logging statements that were not removed before deployment to production.</p>
+              </div>
+            </div>
+
+            <div class="mt-5 bg-orange-50 rounded-lg p-4 border border-orange-100">
+              <h4 class="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Business Impact
+              </h4>
+              <p class="text-sm text-gray-700 leading-relaxed">Exposing sensitive user data poses a significant risk to user privacy and trust, potentially leading to legal and reputational consequences.</p>
+            </div>
+
+            <div class="mt-5 bg-green-50 rounded-lg p-4 border border-green-100">
+              <h4 class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Acceptance Criteria / Fix Criteria
+              </h4>
+              <ul class="criteria-list text-sm text-gray-700 space-y-1.5">
+                <li>No sensitive user data (credit card numbers, API keys, etc.) is logged in the browser console.</li>
+                <li>The fix is verified across all user profile pages and scenarios.</li>
+                <li>A review of the codebase is conducted to ensure no similar issues exist.</li>
+                <li>Automated tests are added to prevent regression.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Empty State (hidden by default) -->
+    <div id="empty-state" class="hidden text-center py-16">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900">No bugs match this filter</h3>
+      <p class="text-sm text-gray-500 mt-1">Try selecting a different filter.</p>
+    </div>
+  </main>
+
+  <script>
+    function toggleCard(btn) {
+      const card = btn.closest('.bug-card');
+      const panel = card.querySelector('.details-panel');
+      const isHidden = panel.classList.contains('hidden');
+      
+      if (isHidden) {
+        panel.classList.remove('hidden');
+        card.classList.add('expanded');
+      } else {
+        panel.classList.add('hidden');
+        card.classList.remove('expanded');
+      }
+    }
+
+    function filterBugs(filter) {
+      // Update active button state
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.dataset.filter === filter) {
+          btn.classList.remove('bg-gray-100', 'text-gray-700');
+          btn.classList.add('bg-gray-900', 'text-white');
+        } else {
+          btn.classList.remove('bg-gray-900', 'text-white');
+          btn.classList.add('bg-gray-100', 'text-gray-700');
+        }
+      });
+
+      // Filter cards
+      const cards = document.querySelectorAll('.bug-card');
+      let visibleCount = 0;
+      
+      cards.forEach(card => {
+        const severity = card.dataset.severity;
+        const priority = card.dataset.priority;
+        
+        if (filter === 'all' || severity === filter || priority === filter) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      // Toggle empty state
+      const emptyState = document.getElementById('empty-state');
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
