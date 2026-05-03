@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SalesforceLoginTestSuite" parallel="false">
+    
+    <test name="LoginTests-Chrome">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+    
+</suite>

@@ -92,3 +92,11 @@ project_19_CREWAI_sample_project/crew_AI_Exercise/03_building_a_bugTriage_agent.
 project_19_CREWAI_sample_project/crew_AI_Exercise/05_FETCH_JIRA_CREATE_TEST_PLAN_AI_AGENT.py
 project_19_CREWAI_sample_project/crew_AI_Exercise/06_FETCH_JIRA_CREATE_TEST_PLAN_AI_AGENT_Add_Memory.py
 
+
+# Secret files
+Project_08_Node_n8n/AgentToGenerateIssueInJIRA.json
+Project_08_Node_n8n/LinkedinProfilecredentials.json
+Project_08_Node_n8n/Sample.json
+Project_08_Node_n8n/googlesecretgooglesheet.json
+Project_08_Node_n8n/sheetdocsecretcode.json
+

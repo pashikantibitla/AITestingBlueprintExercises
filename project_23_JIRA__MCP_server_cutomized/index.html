@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Dashboard - JIRA MCP</title>
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --primary-light: #2E74B5;
+            --accent: #5B9BD5;
+            --success: #28a745;
+            --warning: #e36b00;
+            --danger: #c00000;
+            --bg: #f5f7fa;
+            --card: #ffffff;
+            --text: #333333;
+            --text-muted: #777777;
+            --border: #dde3e9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 1.6rem; font-weight: 600; }
+        header p { opacity: 0.85; font-size: 0.9rem; margin-top: 0.25rem; }
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-mcp { background: var(--success); color: white; }
+        .badge-direct { background: var(--warning); color: white; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem; }
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; }
+        @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--card);
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1rem 1.25rem;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-body { padding: 1.25rem; }
+
+        .form-group { margin-bottom: 1rem; }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(31,78,121,0.08);
+        }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: #f5f7fa; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .btn-block { width: 100%; }
+
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+        }
+        .tab.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .tab:hover:not(.active) { color: var(--text); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .ticket-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #fafbfc;
+        }
+        .ticket-key {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .ticket-summary { font-size: 1rem; margin: 0.25rem 0 0.5rem; }
+        .ticket-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .ticket-meta span { display: flex; align-items: center; gap: 0.25rem; }
+
+        .priority-highest, .priority-critical { color: var(--danger); font-weight: 700; }
+        .priority-high { color: #d9534f; font-weight: 600; }
+        .priority-medium { color: var(--warning); font-weight: 600; }
+        .priority-low, .priority-lowest, .priority-trivial { color: var(--success); }
+
+        .status-open { color: var(--danger); }
+        .status-in-progress { color: var(--warning); }
+        .status-resolved, .status-done, .status-closed { color: var(--success); }
+
+        .severity-p0 { background: var(--danger); color: white; }
+        .severity-p1 { background: #d9534f; color: white; }
+        .severity-p2 { background: var(--warning); color: white; }
+        .severity-p3 { background: var(--accent); color: white; }
+        .severity-p4 { background: var(--success); color: white; }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1.5rem 0 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        .scenario-box {
+            border-left: 4px solid var(--accent);
+            background: #f8fafc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+        .scenario-box h4 { color: var(--primary); margin-bottom: 0.5rem; }
+        .scenario-box .priority-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+        .priority-high-badge { background: #ffebee; color: var(--danger); }
+        .priority-medium-badge { background: #fff3e0; color: var(--warning); }
+        .priority-low-badge { background: #e8f5e9; color: var(--success); }
+
+        .step-list { padding-left: 1.25rem; margin: 0.5rem 0; }
+        .step-list li { margin-bottom: 0.35rem; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+        }
+        th, td {
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:hover { background: #f8fafc; }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+
+        .loader {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .text-sm { font-size: 0.85rem; }
+        .text-muted { color: var(--text-muted); }
+        .font-mono { font-family: 'SF Mono', Monaco, monospace; font-size: 0.8rem; }
+
+        .output-panel {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-connected { background: var(--success); }
+        .status-disconnected { background: var(--danger); }
+
+        /* Toggle switch */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .toggle-row:last-child { border-bottom: none; }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #ccc;
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        input:checked + .slider { background: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>QA Dashboard <span style="font-weight:400">| JIRA MCP Integration</span></h1>
+        <p>Fetch tickets, generate test plans, and triage bugs directly from JIRA — no CREW.AI required</p>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Sidebar -->
+            <aside>
+                <!-- Connection Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>&#9881;</span> Connection Settings
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-row">
+                            <div>
+                                <div style="font-weight:600; font-size:0.85rem;">Connection Mode</div>
+                                <div class="text-sm text-muted" id="modeLabel">Direct JIRA API</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="modeToggle" onchange="toggleMode()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div id="directSettings">
+                            <div class="form-group">
+                                <label>JIRA Base URL</label>
+                                <input type="text" id="jiraBase" value="https://mounikapashikantibitla-1771170864282.atlassian.net">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="text" id="jiraEmail" value="mounikapashikantibitla@gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label>API Token</label>
+                                <input type="password" id="jiraToken" placeholder="Enter JIRA API token">
+                            </div>
+                        </div>
+
+                        <div id="mcpSettings" class="hidden">
+                            <div class="form-group">
+                                <label>MCP Server URL</label>
+                                <input type="text" id="mcpUrl" value="http://127.0.0.1:8002/sse">
+                            </div>
+                            <div class="alert alert-info text-sm">
+                                MCP mode requires the FastMCP server to be running.
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success btn-block btn-sm" onclick="testConnection()">
+                            <span id="connSpinner" class="loader hidden"></span>
+                            <span id="connText">Test Connection</span>
+                        </button>
+                        <div id="connResult" class="mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-header">
+                        <span>&#9874;</span> Quick Actions
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Ticket ID</label>
+                            <input type="text" id="ticketId" placeholder="e.g. SCRUM-2" value="SCRUM-2">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="fetchTicket()">Fetch Ticket</button>
+                            <button class="btn btn-success btn-sm" onclick="generateTestPlan()">Generate Test Plan</button>
+                            <button class="btn btn-warning btn-sm" onclick="triageBug()">Bug Triage</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JQL Search -->
+                <div class="card" style="margin-top:1rem;">
+                    <div class="card-header">
+                        <span>&#128269;</span> JQL Search
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>JQL Query</label>
+                            <textarea id="jqlQuery" rows="2">project = SCRUM ORDER BY created DESC</textarea>
+                        </div>
+                        <button class="btn btn-primary btn-sm btn-block" onclick="searchJQL()">Search Tickets</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('ticket')">&#128196; Ticket Details</button>
+                        <button class="tab" onclick="showTab('testplan')">&#128221; Test Plan</button>
+                        <button class="tab" onclick="showTab('triage')">&#128030; Triage</button>
+                        <button class="tab" onclick="showTab('search')">&#128269; Search Results</button>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Ticket Tab -->
+                        <div id="tab-ticket" class="tab-panel active">
+                            <div id="ticketPlaceholder" class="text-muted text-sm" style="text-align:center; padding:3rem 1rem;">
+                                Enter a Ticket ID and click "Fetch Ticket" to view details
+                            </div>
+                            <div id="ticketContent" class="hidden"></div>
+                        </div>
+
+                        <!-- Test Plan Tab -->
+                        <div id="tab-testplan" class="tab-panel">
+                            <div id="testplanPlaceholder" class="text-muted text-sm" style="text-align:center; padding:3rem 1rem;">
+                                Enter a Ticket ID and click "Generate Test Plan" to create a structured test plan
+                            </div>
+                            <div id="testplanContent" class="hidden"></div>
+                        </div>
+
+                        <!-- Triage Tab -->
+                        <div id="tab-triage" class="tab-panel">
+                            <div id="triagePlaceholder" class="text-muted text-sm" style="text-align:center; padding:3rem 1rem;">
+                                Enter a Ticket ID and click "Bug Triage" to perform automated triage analysis
+                            </div>
+                            <div id="triageContent" class="hidden"></div>
+                        </div>
+
+                        <!-- Search Tab -->
+                        <div id="tab-search" class="tab-panel">
+                            <div id="searchPlaceholder" class="text-muted text-sm" style="text-align:center; padding:3rem 1rem;">
+                                Run a JQL query to see search results
+                            </div>
+                            <div id="searchContent" class="hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // ===================== STATE =====================
+        let isMcpMode = false;
+        let currentTicket = null;
+
+        // ===================== UTILS =====================
+        function $(id) { return document.getElementById(id); }
+        function setHtml(id, html) { $(id).innerHTML = html; }
+        function show(id) { $(id).classList.remove('hidden'); }
+        function hide(id) { $(id).classList.add('hidden'); }
+        function esc(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function priorityClass(p) {
+            const pl = (p || '').toLowerCase();
+            if (pl.includes('highest') || pl.includes('critical')) return 'priority-highest';
+            if (pl.includes('high')) return 'priority-high';
+            if (pl.includes('medium')) return 'priority-medium';
+            if (pl.includes('low')) return 'priority-low';
+            return '';
+        }
+
+        function statusClass(s) {
+            const sl = (s || '').toLowerCase().replace(/\s+/g, '-');
+            if (sl.includes('open')) return 'status-open';
+            if (sl.includes('progress')) return 'status-in-progress';
+            if (sl.includes('resolved') || sl.includes('done') || sl.includes('closed')) return 'status-resolved';
+            return '';
+        }
+
+        function severityBadgeClass(s) {
+            if (s.includes('P0')) return 'severity-p0';
+            if (s.includes('P1')) return 'severity-p1';
+            if (s.includes('P2')) return 'severity-p2';
+            if (s.includes('P3')) return 'severity-p3';
+            return 'severity-p4';
+        }
+
+        // ===================== MODE TOGGLE =====================
+        function toggleMode() {
+            isMcpMode = $('modeToggle').checked;
+            $('modeLabel').textContent = isMcpMode ? 'MCP Server' : 'Direct JIRA API';
+            if (isMcpMode) {
+                hide('directSettings');
+                show('mcpSettings');
+            } else {
+                show('directSettings');
+                hide('mcpSettings');
+            }
+        }
+
+        // ===================== API HELPERS =====================
+        async function jiraRequest(path, options = {}) {
+            const base = $('jiraBase').value.replace(/\/$/, '');
+            const email = $('jiraEmail').value;
+            const token = $('jiraToken').value;
+            const url = base + path;
+
+            const auth = btoa(email + ':' + token);
+            const resp = await fetch(url, {
+                ...options,
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + auth,
+                    ...(options.headers || {})
+                }
+            });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+            return resp.json();
+        }
+
+        async function mcpCall(toolName, args) {
+            // For browser-based MCP, we use a simple HTTP proxy or direct SSE
+            // This is a simplified version - in production use proper MCP client
+            const url = $('mcpUrl').value.replace(/\/$/, '');
+            // For demo: fallback to direct JIRA API in browser
+            throw new Error('Browser MCP client not implemented. Use Direct JIRA API mode.');
+        }
+
+        async function fetchTicketData(ticketId) {
+            if (isMcpMode) {
+                return mcpCall('fetch_jira_ticket', { ticket_id: ticketId });
+            }
+            const data = await jiraRequest('/rest/api/3/issue/' + ticketId);
+            const f = data.fields || {};
+            return {
+                key: data.key || ticketId,
+                summary: f.summary || 'No summary',
+                description: extractDesc(f.description),
+                priority: f.priority?.name || 'Not specified',
+                issue_type: f.issuetype?.name || 'Not specified',
+                status: f.status?.name || 'Unknown',
+                reporter: f.reporter?.displayName || 'Unknown',
+                assignee: f.assignee?.displayName || 'Unassigned',
+                labels: f.labels || [],
+                created: f.created || 'Unknown',
+                updated: f.updated || 'Unknown'
+            };
+        }
+
+        function extractDesc(descField) {
+            if (!descField || !descField.content) return 'No description provided.';
+            const parts = [];
+            for (const block of descField.content) {
+                if (block.content) {
+                    for (const item of block.content) {
+                        if (item.text) parts.push(item.text);
+                    }
+                }
+            }
+            return parts.join('\n') || 'No description provided.';
+        }
+
+        // ===================== ACTIONS =====================
+        async function testConnection() {
+            const spinner = $('connSpinner');
+            const text = $('connText');
+            spinner.classList.remove('hidden');
+            text.textContent = 'Testing...';
+
+            try {
+                if (isMcpMode) {
+                    setHtml('connResult', '<div class="alert alert-info">MCP mode: ensure server is running on ' + esc($('mcpUrl').value) + '</div>');
+                } else {
+                    const projects = await jiraRequest('/rest/api/3/project');
+                    const names = projects.map(p => p.name).slice(0, 5);
+                    setHtml('connResult',
+                        '<div class="alert alert-success">Connected! Projects: ' + esc(names.join(', ')) + '</div>');
+                }
+            } catch (e) {
+                setHtml('connResult', '<div class="alert alert-error">Connection failed: ' + esc(e.message) + '</div>');
+            } finally {
+                spinner.classList.add('hidden');
+                text.textContent = 'Test Connection';
+            }
+        }
+
+        async function fetchTicket() {
+            const id = $('ticketId').value.trim().toUpperCase();
+            if (!id) { alert('Enter a ticket ID'); return; }
+
+            showTab('ticket');
+            setHtml('ticketContent', '<div class="text-muted text-sm" style="padding:2rem; text-align:center;">Loading...</div>');
+            hide('ticketPlaceholder');
+            show('ticketContent');
+
+            try {
+                const data = await fetchTicketData(id);
+                currentTicket = data;
+                renderTicket(data);
+            } catch (e) {
+                setHtml('ticketContent', '<div class="alert alert-error">Error: ' + esc(e.message) + '</div>');
+            }
+        }
+
+        function renderTicket(t) {
+            const html = `
+                <div class="ticket-card">
+                    <div class="ticket-key">${esc(t.key)}</div>
+                    <div class="ticket-summary">${esc(t.summary)}</div>
+                    <div class="ticket-meta">
+                        <span class="${priorityClass(t.priority)}">&#9874; ${esc(t.priority)}</span>
+                        <span class="${statusClass(t.status)}">&#9679; ${esc(t.status)}</span>
+                        <span>&#128100; ${esc(t.reporter)}</span>
+                        <span>&#9998; ${esc(t.assignee)}</span>
+                        <span>&#128197; ${esc(t.created)}</span>
+                    </div>
+                    ${t.labels.length ? `<div class="mt-2"><span class="text-sm text-muted">Labels: ${t.labels.map(l => `<span class="badge" style="background:#e3f2fd;color:#1565c0">${esc(l)}</span>`).join(' ')}</span></div>` : ''}
+                </div>
+                <div class="section-title">Description</div>
+                <div style="background:#f8fafc;padding:1rem;border-radius:6px;white-space:pre-wrap;font-size:0.9rem;">${esc(t.description)}</div>
+            `;
+            setHtml('ticketContent', html);
+        }
+
+        async function generateTestPlan() {
+            const id = $('ticketId').value.trim().toUpperCase();
+            if (!id) { alert('Enter a ticket ID'); return; }
+
+            showTab('testplan');
+            hide('testplanPlaceholder');
+            show('testplanContent');
+            setHtml('testplanContent', '<div class="text-muted text-sm" style="padding:2rem; text-align:center;">Generating test plan...</div>');
+
+            try {
+                let ticket = currentTicket;
+                if (!ticket || ticket.key !== id) {
+                    ticket = await fetchTicketData(id);
+                    currentTicket = ticket;
+                }
+                renderTestPlan(ticket);
+            } catch (e) {
+                setHtml('testplanContent', '<div class="alert alert-error">Error: ' + esc(e.message) + '</div>');
+            }
+        }
+
+        function renderTestPlan(t) {
+            const summary = t.summary || 'Unknown';
+            const priority = t.priority || 'Not specified';
+            const issueType = t.issue_type || 'Not specified';
+            const now = new Date().toISOString();
+
+            const scenarios = [
+                { id: 'TS-01', title: `Verify ${summary} - Happy Path`, priority: 'High',
+                  pre: 'User is authenticated; test environment is stable.',
+                  steps: ['Navigate to the affected feature/module.','Perform the primary action as per normal business flow.','Verify the expected outcome is achieved without errors.'],
+                  expected: 'The feature works correctly and the issue is no longer reproducible.' },
+                { id: 'TS-02', title: `Verify ${summary} - Negative Scenario`, priority: 'High',
+                  pre: 'User is authenticated; invalid/malformed input data is prepared.',
+                  steps: ['Navigate to the affected feature/module.','Provide invalid or edge-case input data.','Submit the action and observe system behavior.'],
+                  expected: 'System handles invalid input gracefully with appropriate error messages.' },
+                { id: 'TS-03', title: 'Regression - Related Module Check', priority: 'High',
+                  pre: 'Fix deployed; related modules accessible.',
+                  steps: ['Identify modules that interact with the fixed component.','Execute core workflows through each related module.','Verify no new defects or broken functionality.'],
+                  expected: 'All related modules function correctly; no regression defects found.' },
+                { id: 'TS-04', title: 'Boundary Value Analysis', priority: 'Medium',
+                  pre: 'Boundary values for inputs are identified and documented.',
+                  steps: ['Test with minimum valid input value.','Test with maximum valid input value.','Test with values just below and above boundaries.'],
+                  expected: 'System accepts valid boundaries and rejects invalid ones with proper messaging.' },
+                { id: 'TS-05', title: 'Cross-Browser / Cross-Platform Verification', priority: 'Medium',
+                  pre: 'Application deployed to test environment; multiple browsers/platforms available.',
+                  steps: ['Execute the fix validation on Chrome browser.','Execute the fix validation on Firefox browser.','Execute the fix validation on mobile responsive view (if applicable).'],
+                  expected: 'Consistent behavior across all supported browsers and platforms.' },
+                { id: 'TS-06', title: 'Edge Case - Concurrent User Actions', priority: 'Low',
+                  pre: 'Multiple test user accounts prepared; load testing tool available (optional).',
+                  steps: ['Simulate two users performing the same action simultaneously.','Observe data consistency and locking mechanisms.','Verify no race conditions or data corruption occur.'],
+                  expected: 'System handles concurrency correctly; data remains consistent.' },
+            ];
+
+            let html = `
+                <div class="section-title">Executive Summary</div>
+                <p>This document outlines the Test Plan and Test Strategy for JIRA ticket <strong>${esc(t.key)}</strong>. The objective is to validate the fix, ensure no regressions, and confirm all acceptance criteria are met.</p>
+
+                <div class="section-title">Test Strategy</div>
+                <h4 style="color:var(--primary-light);margin:1rem 0 0.5rem;">Objectives</h4>
+                <ul class="step-list">
+                    <li>Validate that the reported issue is fixed and does not reoccur under normal conditions.</li>
+                    <li>Ensure related functionality remains unaffected (regression testing).</li>
+                    <li>Verify acceptance criteria are fully met before sign-off.</li>
+                    <li>Identify any edge cases or boundary conditions that may expose additional issues.</li>
+                </ul>
+
+                <h4 style="color:var(--primary-light);margin:1rem 0 0.5rem;">Scope</h4>
+                <p><strong>In Scope:</strong></p>
+                <ul class="step-list">
+                    <li>Functional testing of ${esc(issueType.toLowerCase())} and related user flows.</li>
+                    <li>Regression testing of affected modules and downstream integrations.</li>
+                    <li>Cross-browser and cross-platform verification (if applicable).</li>
+                    <li>UI/UX validation for any visual or interaction changes.</li>
+                </ul>
+                <p><strong>Out of Scope:</strong></p>
+                <ul class="step-list">
+                    <li>Performance testing (unless explicitly specified in ticket).</li>
+                    <li>Security penetration testing (unless ticket is security-related).</li>
+                    <li>Third-party integration testing beyond direct dependencies.</li>
+                    <li>Load testing and stress testing.</li>
+                </ul>
+
+                <h4 style="color:var(--primary-light);margin:1rem 0 0.5rem;">Test Approach</h4>
+                <table>
+                    <tr><th>Phase</th><th>Activity</th><th>Owner</th></tr>
+                    <tr><td>Phase 1</td><td>Test Planning & Design</td><td>QA Lead</td></tr>
+                    <tr><td>Phase 2</td><td>Test Case Development</td><td>QA Engineer</td></tr>
+                    <tr><td>Phase 3</td><td>Test Execution</td><td>QA Engineer</td></tr>
+                    <tr><td>Phase 4</td><td>Bug Verification & Regression</td><td>QA Engineer</td></tr>
+                    <tr><td>Phase 5</td><td>Sign-off & Reporting</td><td>QA Lead</td></tr>
+                </table>
+
+                <div class="section-title">Test Scenarios</div>
+            `;
+
+            for (const s of scenarios) {
+                const badgeClass = s.priority === 'High' ? 'priority-high-badge' : s.priority === 'Medium' ? 'priority-medium-badge' : 'priority-low-badge';
+                html += `
+                    <div class="scenario-box">
+                        <h4>${esc(s.id)}: ${esc(s.title)} <span class="priority-badge ${badgeClass}">${esc(s.priority)}</span></h4>
+                        <p class="text-sm text-muted" style="margin-bottom:0.5rem;"><strong>Preconditions:</strong> ${esc(s.pre)}</p>
+                        <p class="text-sm" style="margin-bottom:0.25rem;"><strong>Steps:</strong></p>
+                        <ol class="step-list">
+                            ${s.steps.map(st => `<li>${esc(st)}</li>`).join('')}
+                        </ol>
+                        <p class="text-sm" style="margin-top:0.5rem;"><strong>Expected Result:</strong> ${esc(s.expected)}</p>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="section-title">Defect Management</div>
+                <p><strong>Tool:</strong> JIRA</p>
+                <p><strong>Severity Levels:</strong> Critical, High, Medium, Low</p>
+                <p><strong>SLA:</strong> Critical = 24 hours | High = 48 hours | Medium = 1 week | Low = next sprint</p>
+
+                <div class="section-title">Sign-off Criteria</div>
+                <ul class="step-list">
+                    <li>All acceptance criteria are met and verified.</li>
+                    <li>No critical or high-severity defects are open.</li>
+                    <li>Test coverage is >= 80%.</li>
+                    <li>Stakeholder approval is obtained via formal sign-off.</li>
+                </ul>
+
+                <div class="section-title">Approvals</div>
+                <table>
+                    <tr><th>Role</th><th>Name</th><th>Signature / Date</th></tr>
+                    <tr><td>QA Lead</td><td>_________________</td><td>_________________</td></tr>
+                    <tr><td>Product Owner</td><td>_________________</td><td>_________________</td></tr>
+                </table>
+
+                <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); text-align:center; color:var(--text-muted); font-size:0.8rem;">
+                    Generated by QA Dashboard JIRA MCP &bull; ${now}
+                </div>
+            `;
+
+            setHtml('testplanContent', html);
+        }
+
+        async function triageBug() {
+            const id = $('ticketId').value.trim().toUpperCase();
+            if (!id) { alert('Enter a ticket ID'); return; }
+
+            showTab('triage');
+            hide('triagePlaceholder');
+            show('triageContent');
+            setHtml('triageContent', '<div class="text-muted text-sm" style="padding:2rem; text-align:center;">Analyzing...</div>');
+
+            try {
+                let ticket = currentTicket;
+                if (!ticket || ticket.key !== id) {
+                    ticket = await fetchTicketData(id);
+                    currentTicket = ticket;
+                }
+                renderTriage(ticket);
+            } catch (e) {
+                setHtml('triageContent', '<div class="alert alert-error">Error: ' + esc(e.message) + '</div>');
+            }
+        }
+
+        function renderTriage(t) {
+            const priority = (t.priority || 'medium').toLowerCase();
+            let severity = 'P3 (Minor)';
+            if (priority.includes('highest') || priority.includes('critical')) severity = 'P0 (Blocker)';
+            else if (priority.includes('high')) severity = 'P1 (Critical)';
+            else if (priority.includes('medium')) severity = 'P2 (Major)';
+            else if (priority.includes('low')) severity = 'P4 (Trivial)';
+
+            let category = 'Functional';
+            const labels = (t.labels || []).map(l => l.toLowerCase());
+            if (labels.some(l => ['ui','ux','frontend'].includes(l))) category = 'UI';
+            else if (labels.some(l => ['performance','slow','latency'].includes(l))) category = 'Performance';
+            else if (labels.some(l => ['security','auth','vulnerability'].includes(l))) category = 'Security';
+            else if (labels.some(l => ['data','database','db'].includes(l))) category = 'Data';
+
+            const sprintPriority = (severity.includes('P0') || severity.includes('P1')) ? 'High' : 'Medium';
+
+            const html = `
+                <div class="section-title">Classification</div>
+                <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1rem;">
+                    <div class="card" style="flex:1; min-width:140px;">
+                        <div class="card-body" style="text-align:center;">
+                            <div class="text-sm text-muted">Severity</div>
+                            <div class="badge ${severityBadgeClass(severity)}" style="font-size:1rem; padding:0.3rem 0.8rem; margin-top:0.25rem;">${esc(severity)}</div>
+                        </div>
+                    </div>
+                    <div class="card" style="flex:1; min-width:140px;">
+                        <div class="card-body" style="text-align:center;">
+                            <div class="text-sm text-muted">Priority</div>
+                            <div style="font-weight:700; margin-top:0.25rem; ${priorityClass(t.priority)}">${esc(t.priority)}</div>
+                        </div>
+                    </div>
+                    <div class="card" style="flex:1; min-width:140px;">
+                        <div class="card-body" style="text-align:center;">
+                            <div class="text-sm text-muted">Category</div>
+                            <div style="font-weight:700; margin-top:0.25rem;">${esc(category)}</div>
+                        </div>
+                    </div>
+                    <div class="card" style="flex:1; min-width:140px;">
+                        <div class="card-body" style="text-align:center;">
+                            <div class="text-sm text-muted">Sprint Priority</div>
+                            <div style="font-weight:700; margin-top:0.25rem; color:${sprintPriority==='High'?'var(--danger)':'var(--warning)'};">${esc(sprintPriority)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Business Impact</div>
+                <p>Ticket '${esc(t.summary)}' has ${esc(t.priority)} priority and is classified as ${esc(severity)}. Impact depends on affected user base and release timeline.</p>
+
+                <div class="section-title">Root Cause Analysis</div>
+                <div class="scenario-box" style="border-left-color:var(--warning);">
+                    <h4>Likely Cause</h4>
+                    <p>Requires developer investigation. Common causes include: logic error, missing validation, integration failure, or data inconsistency.</p>
+                </div>
+                <div class="scenario-box" style="border-left-color:var(--accent);">
+                    <h4>Affected Layer</h4>
+                    <p>Unknown - verify through logs (UI -> API -> Service -> DB).</p>
+                </div>
+                <h4 style="color:var(--primary-light);margin:1rem 0 0.5rem;">Investigation Steps</h4>
+                <ol class="step-list">
+                    <li>Reproduce the issue in a stable environment.</li>
+                    <li>Check application logs for error stacks.</li>
+                    <li>Review recent commits/deployments related to the affected module.</li>
+                    <li>Verify database state and related records.</li>
+                    <li>Check third-party service status if applicable.</li>
+                </ol>
+
+                <div class="section-title">Test Recommendations</div>
+                <h4 style="color:var(--primary-light);margin:0.75rem 0 0.5rem;">Verification Tests</h4>
+                <ul class="step-list">
+                    <li>Confirm the fix for '${esc(t.summary)}' works under normal conditions.</li>
+                </ul>
+                <h4 style="color:var(--primary-light);margin:0.75rem 0 0.5rem;">Regression Tests</h4>
+                <ul class="step-list">
+                    <li>Run smoke tests on the affected module.</li>
+                    <li>Execute integration tests with adjacent modules.</li>
+                    <li>Validate data consistency across related tables.</li>
+                </ul>
+                <h4 style="color:var(--primary-light);margin:0.75rem 0 0.5rem;">Edge Cases</h4>
+                <ul class="step-list">
+                    <li>Test with null/empty inputs.</li>
+                    <li>Test with maximum allowed data size.</li>
+                    <li>Test concurrent access to the same resource.</li>
+                    <li>Test behavior during network interruptions.</li>
+                </ul>
+                <div class="alert alert-info" style="margin-top:1rem;">
+                    <strong>Automation Approach:</strong> Use Playwright (TypeScript) for E2E validation. Add API contract tests for backend verification.
+                </div>
+            `;
+            setHtml('triageContent', html);
+        }
+
+        async function searchJQL() {
+            const jql = $('jqlQuery').value.trim();
+            if (!jql) { alert('Enter a JQL query'); return; }
+
+            showTab('search');
+            hide('searchPlaceholder');
+            show('searchContent');
+            setHtml('searchContent', '<div class="text-muted text-sm" style="padding:2rem; text-align:center;">Searching...</div>');
+
+            try {
+                if (isMcpMode) {
+                    setHtml('searchContent', '<div class="alert alert-info">MCP search not available in browser mode. Switch to Direct JIRA API.</div>');
+                    return;
+                }
+                const data = await jiraRequest('/rest/api/3/search?jql=' + encodeURIComponent(jql) + '&maxResults=20&fields=summary,status,priority,issuetype,created,assignee,reporter');
+                renderSearchResults(data.issues || []);
+            } catch (e) {
+                setHtml('searchContent', '<div class="alert alert-error">Error: ' + esc(e.message) + '</div>');
+            }
+        }
+
+        function renderSearchResults(issues) {
+            if (!issues.length) {
+                setHtml('searchContent', '<div class="alert alert-info">No tickets found.</div>');
+                return;
+            }
+            let html = `<table>
+                <tr><th>Key</th><th>Summary</th><th>Status</th><th>Priority</th><th>Type</th><th>Assignee</th></tr>`;
+            for (const issue of issues) {
+                const f = issue.fields || {};
+                html += `<tr>
+                    <td><strong>${esc(issue.key)}</strong></td>
+                    <td>${esc(f.summary || '')}</td>
+                    <td class="${statusClass(f.status?.name)}">${esc(f.status?.name || '')}</td>
+                    <td class="${priorityClass(f.priority?.name)}">${esc(f.priority?.name || '')}</td>
+                    <td>${esc(f.issuetype?.name || '')}</td>
+                    <td>${esc(f.assignee?.displayName || 'Unassigned')}</td>
+                </tr>`;
+            }
+            html += '</table>';
+            setHtml('searchContent', html);
+        }
+
+        // ===================== TABS =====================
+        function showTab(name) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            $('tab-' + name).classList.add('active');
+        }
+
+        // Initialize
+        toggleMode();
+    </script>
+</body>
+</html>
