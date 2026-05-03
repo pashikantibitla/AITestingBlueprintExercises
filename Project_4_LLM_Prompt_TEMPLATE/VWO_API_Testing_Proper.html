@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VWO API Testing Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent: #818cf8;
+            --method-post: #10b981;
+            --method-get: #3b82f6;
+            --method-patch: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: #0f172a;
+        }
+
+        th {
+            padding: 20px 24px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 24px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #2d3748;
+        }
+
+        .id-badge {
+            font-family: monospace;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(129, 140, 248, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(129, 140, 248, 0.2);
+        }
+
+        .method {
+            font-weight: 800;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .method-post {
+            color: var(--method-post);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .method-get {
+            color: var(--method-get);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .method-patch {
+            color: var(--method-patch);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .endpoint {
+            font-family: monospace;
+            color: #e2e8f0;
+            background: #0f172a;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        code {
+            display: block;
+            white-space: pre-wrap;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .status-needs {
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>API Testing Specifications</h1>
+            <p>VWO Platform - Digital Experience Optimization</p>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 100px;">Test ID</th>
+                        <th style="width: 120px;">Method</th>
+                        <th style="width: 250px;">Endpoint</th>
+                        <th>Request Body / Logic</th>
+                        <th style="width: 180px;">Expected Status</th>
+                        <th style="width: 250px;">Expected Response</th>
+                    </tr>
+                </thead>
+                <tbody id="api-table-body">
+                    <!-- Data Injected Here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 VWO QA Automation | API Testing Specialist Blueprint</p>
+        </div>
+    </div>
+
+    <script>
+        const apiData = [
+            { id: "API-001", method: "POST", endpoint: "/experiments", body: '{ "type": "AB", "variations": [...], "metrics": [...] }', status: "Needs Doc", response: "Result of A/B test creation" },
+            { id: "API-002", method: "GET", endpoint: "/stats", body: "?experiment_id=[ID]", status: "Needs Doc", response: "Bayesian SmartStats payload" },
+            { id: "API-003", method: "POST", endpoint: "/targeting", body: '{ "segment": { "geo": "US", "behavior": "..." } }', status: "Needs Doc", response: "Audience segment confirmation" },
+            { id: "API-004", method: "GET", endpoint: "/insights/heatmaps", body: "?url=[EncodedURL]", status: "Needs Doc", response: "Heatmap coordinate data" },
+            { id: "API-005", method: "POST", endpoint: "/auth/2fa", body: '{ "code": "123456" }', status: "Needs Doc", response: "Auth token or Error message" },
+            { id: "API-006", method: "POST", endpoint: "/integrations/shopify", body: '{ "api_key": "...", "sync_freq": "..." }', status: "Needs Doc", response: "Handshake success/failure" },
+            { id: "API-007", method: "PATCH", endpoint: "/plan/kanban", body: '{ "card_id": "...", "state": "complete" }', status: "Needs Doc", response: "Updated status and timestamp" },
+            { id: "API-008", method: "POST", endpoint: "/privacy/export", body: '{ "user_id": "...", "format": "json" }', status: "Needs Doc", response: "GDPR-compliant data link" }
+        ];
+
+        const body = document.getElementById('api-table-body');
+        apiData.forEach(item => {
+            const tr = document.createElement('tr');
+            const methodClass = `method-${item.method.toLowerCase()}`;
+            tr.innerHTML = `
+                <td><span class="id-badge">${item.id}</span></td>
+                <td><span class="method ${methodClass}">${item.method}</span></td>
+                <td><span class="endpoint">${item.endpoint}</span></td>
+                <td><code>${item.body}</code></td>
+                <td><span class="status-needs">${item.status}</span></td>
+                <td>${item.response}</td>
+            `;
+            body.appendChild(tr);
+        });
+    </script>
+</body>
+
+</html>

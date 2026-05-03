@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VWO Test Plan Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --priority-must: #ef4444;
+            --priority-high: #f59e0b;
+            --priority-medium: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: #f1f5f9;
+        }
+
+        th {
+            padding: 16px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 20px 24px;
+            font-size: 14px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .tid {
+            color: var(--primary);
+            font-weight: 600;
+            font-family: monospace;
+            background: #eff6ff;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .category {
+            font-weight: 500;
+        }
+
+        .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-must { background: #fee2e2; color: #991b1b; }
+        .priority-high { background: #fef3c7; color: #92400e; }
+        .priority-medium { background: #dbeafe; color: #1e40af; }
+
+        .steps {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 4px;
+            list-style-position: inside;
+        }
+
+        .expected {
+            font-style: italic;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VWO Platform Test Plan</h1>
+            <p>Comprehensive QA Use Cases generated from VWO PRD</p>
+        </div>
+        
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">TID</th>
+                        <th style="width: 120px;">Category</th>
+                        <th style="width: 200px;">Description</th>
+                        <th style="width: 200px;">Pre-conditions</th>
+                        <th>Steps</th>
+                        <th style="width: 250px;">Expected Result</th>
+                        <th style="width: 100px;">Priority</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Data injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            { tid: "TC-001", cat: "Functional", desc: "Create A/B Test", pre: "User logged in, Project exists", steps: "1. Go to A/B Test. 2. Define metrics. 3. Launch", exp: "Test launched; Status is 'Monitoring progress'", prio: "Must" },
+            { tid: "TC-002", cat: "Functional", desc: "Setup Split URL Testing", pre: "User logged in", steps: "1. Enter URLs. 2. Define metrics. 3. Launch", exp: "Traffic distributed; SmartStats tracks visitor", prio: "Must" },
+            { tid: "TC-003", cat: "Functional", desc: "Multivariate Testing", pre: "User logged in", steps: "1. Define variations. 2. Launch test.", exp: "System tracks all combinations correctly.", prio: "Must" },
+            { tid: "TC-004", cat: "Edge", desc: "SmartStats Low Traffic", pre: "Test active (< 50 visitors)", steps: "1. Monitor stats for low volume test.", exp: "Marked 'Inconclusive' until significance.", prio: "High" },
+            { tid: "TC-005", cat: "Boundary", desc: "Max Variation Limit", pre: "User logged in", steps: "1. Add variations until system limit.", exp: "System restricts adding beyond limit.", prio: "Medium" },
+            { tid: "TC-006", cat: "Functional", desc: "Heatmap Generation", pre: "Tracking active", steps: "1. Go to Insights > Heatmaps. 2. Select page.", exp: "Heatmap overlay rendered correctly on page.", prio: "Must" },
+            { tid: "TC-007", cat: "Functional", desc: "Session Playback", pre: "Sessions recorded", steps: "1. Go to Insights > Sessions. 2. Play video.", exp: "Interactions (click/scroll) replayed with sync", prio: "Must" },
+            { tid: "TC-008", cat: "Boundary", desc: "Multi-attribute Targeting", pre: "User logged in", steps: "1. Create segment with 5+ attributes.", exp: "Users matching rules included in segment.", prio: "High" },
+            { tid: "TC-009", cat: "Negative", desc: "RBAC Access Denied", pre: "User with 'Viewer' role", steps: "1. Login as Viewer. 2. Attempt Edit/Delete.", exp: "Action buttons disabled; 'Access Denied' shown", prio: "Must" },
+            { tid: "TC-010", cat: "Functional", desc: "Shopify Sync", pre: "Shopify API enabled", steps: "1. Go to Integrations. 2. Manual sync.", exp: "Data successfuly syncs with external platform.", prio: "High" },
+            { tid: "TC-011", cat: "Non-Functional", desc: "Editor Loading Speed", pre: "Stable connection", steps: "1. Load Editor for complex page.", exp: "Editor fully interactive within 2 seconds.", prio: "Must" },
+            { tid: "TC-012", cat: "Security", desc: "2FA Login Process", pre: "2FA enabled", steps: "1. Enter Credentials. 2. Enter 2FA code.", exp: "Dashboard displayed securely.", prio: "Must" },
+            { tid: "TC-013", cat: "Functional", desc: "Funnel Step Drop-off", pre: "Funnel defined", steps: "1. Go to Insights > Funnels. 2. View report.", exp: "UI shows drop-off rates versus completion.", prio: "Must" },
+            { tid: "TC-014", cat: "Functional", desc: "Real-time Personalization", pre: "Campaign active", steps: "1. Access page as targeted segment user.", exp: "Tailored content served instantly.", prio: "High" },
+            { tid: "TC-015", cat: "Functional", desc: "Kanban Board Move", pre: "Workflow active", steps: "1. Move card in Kanban board.", exp: "Status updates; timestamp captured in log.", prio: "Medium" },
+            { tid: "TC-016", cat: "Data Privacy", desc: "GDPR Data Export", pre: "User data request", steps: "1. Go to Settings > Privacy. 2. Export data.", exp: "Downloadable JSON/CSV file is generated.", prio: "Must" },
+            { tid: "TC-017", cat: "Negative", desc: "Missing Metric Error", pre: "Partial setup", steps: "1. Attempt Launch without metrics.", exp: "'Target Metric Required' error displayed.", prio: "Must" },
+            { tid: "TC-018", cat: "Reliability", desc: "Uptime Verification", pre: "Enterprise account", steps: "1. Review monthly uptime report.", exp: "Uptime recorded as >= 99.9%.", prio: "Must" }
+        ];
+
+        const body = document.getElementById('table-body');
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            const prioClass = `priority-${item.prio.toLowerCase()}`;
+            tr.innerHTML = `
+                <td><span class="tid">${item.tid}</span></td>
+                <td class="category">${item.cat}</td>
+                <td style="font-weight: 500;">${item.desc}</td>
+                <td>${item.pre}</td>
+                <td class="steps">${item.steps}</td>
+                <td class="expected">${item.exp}</td>
+                <td><span class="priority ${prioClass}">${item.prio}</span></td>
+            `;
+            body.appendChild(tr);
+        });
+    </script>
+</body>
+</html>
