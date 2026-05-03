@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTA Automation Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.5;
+    }
+    .header {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      padding: 24px 32px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .stats-container {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px 32px;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 28px;
+      min-width: 130px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      border: 1px solid #e5e7eb;
+      transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+    .stat-total .stat-value { color: #374151; }
+    .stat-passed .stat-value { color: #059669; }
+    .stat-failed .stat-value { color: #dc2626; }
+    .stat-skipped .stat-value { color: #f59e0b; }
+    .stat-rate .stat-value { color: #2563eb; }
+    .stat-duration .stat-value { color: #7c3aed; }
+
+    .env-bar {
+      background: white;
+      margin: 0 32px 16px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      font-size: 13px;
+    }
+    .env-item { display: flex; align-items: center; gap: 8px; }
+    .env-label { color: #6b7280; font-weight: 500; text-transform: uppercase; font-size: 11px; }
+    .env-badge {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .env-badge.browser { background: #dbeafe; color: #1e40af; }
+    .env-badge.platform { background: #f3e8ff; color: #6b21a8; }
+
+    .filters {
+      background: white;
+      margin: 0 32px 16px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-group:last-child { margin-bottom: 0; }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #4b5563;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .filter-option:hover { background: #f3f4f6; }
+    .filter-option input { cursor: pointer; }
+
+    .table-container {
+      margin: 0 32px 32px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead {
+      background: #1f2937;
+      color: white;
+    }
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+    }
+    tbody tr:hover { background: #f9fafb; }
+    tbody tr.failed { background: #fef2f2; }
+    tbody tr.passed { background: #f0fdf4; }
+    tbody tr.skipped { background: #fffbeb; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-badge.passed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .status-badge.failed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .status-badge.skipped {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-badge.flaky {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .suite-tag {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .priority-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .priority-tag.p0 { background: #fee2e2; color: #991b1b; }
+    .priority-tag.p1 { background: #dbeafe; color: #1e40af; }
+    .priority-tag.p2 { background: #f3f4f6; color: #374151; }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+    .action-link.view {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+    .action-link.view:hover { background: #fee2e2; }
+    .action-link.play {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    .action-link.play:hover { background: #fde68a; }
+    .action-link.trace {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+    .action-link.trace:hover { background: #dbeafe; }
+    .action-link.disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .retry-badge {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .test-name-cell {
+      font-weight: 500;
+      color: #111827;
+      max-width: 320px;
+      word-wrap: break-word;
+    }
+    .file-cell {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .time-cell {
+      font-size: 11px;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+    .duration-cell {
+      font-weight: 600;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1200px) {
+      .table-container { overflow-x: auto; }
+      table { min-width: 1200px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎭 TTA Automation Report</h1>
+    <p>The Testing Academy — Playwright Migrated Framework</p>
+  </div>
+
+  <div class="stats-container">
+    <div class="stat-card stat-total">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Total Tests</div>
+    </div>
+    <div class="stat-card stat-passed">
+      <div class="stat-value">2</div>
+      <div class="stat-label">Passed</div>
+    </div>
+    <div class="stat-card stat-failed">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Failed</div>
+    </div>
+    <div class="stat-card stat-skipped">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Skipped</div>
+    </div>
+    <div class="stat-card stat-rate">
+      <div class="stat-value">66.7%</div>
+      <div class="stat-label">Pass Rate</div>
+    </div>
+    <div class="stat-card stat-duration">
+      <div class="stat-value">1m 28s</div>
+      <div class="stat-label">Duration</div>
+    </div>
+  </div>
+
+  <div class="env-bar">
+    <div class="env-item">
+      <span class="env-label">Environment</span>
+      <span class="env-badge">QA</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">Browser</span>
+      <span class="env-badge browser">CHROMIUM</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">Platform</span>
+      <span class="env-badge platform">Windows</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">Workers</span>
+      <span style="font-weight:600;color:#374151;">3</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">Run ID</span>
+      <span style="font-family:monospace;font-size:12px;color:#6b7280;">20260503130229</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">Started</span>
+      <span style="font-size:12px;color:#374151;">May 03, 2026, 18:30:47</span>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <span class="filter-label">📌 Priority:</span>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="priority" value="all">
+        All
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="priority" value="P0">
+        P0
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="priority" value="P1">
+        P1
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="priority" value="P2">
+        P2
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="priority" value="Smoke">
+        Smoke
+      </label>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">📊 Status:</span>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="status" value="all">
+        All
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="status" value="PASSED">
+        ✅ Passed
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="status" value="FAILED">
+        ❌ Failed
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" checked onchange="filterTable()" data-filter="status" value="SKIPPED">
+        ⏭️ Skipped
+      </label>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>S.NO</th>
+          <th>SUITE</th>
+          <th>TEST NAME</th>
+          <th>AUTHOR</th>
+          <th>PRIORITY</th>
+          <th>TAGS</th>
+          <th>FILE</th>
+          <th>START TIME</th>
+          <th>END TIME</th>
+          <th>DURATION</th>
+          <th>STATUS</th>
+          <th>SCREENSHOT</th>
+          <th>VIDEO</th>
+          <th>TRACE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="passed" data-priority="P1" data-status="PASSED">
+          <td>1</td>
+          <td><span class="suite-tag">chromium</span></td>
+          <td class="test-name-cell">testPass - Should pass successfully</td>
+          <td>TTA-QA</td>
+          <td><span class="priority-tag p1">P1</span></td>
+          <td>P1, Regression, VWO, Login</td>
+          <td class="file-cell">vwo/vwo-login-pf.spec.ts</td>
+          <td class="time-cell">May 03, 2026, 18:30:59</td>
+          <td class="time-cell">May 03, 2026, 18:31:35</td>
+          <td class="duration-cell">36s</td>
+          <td><span class="status-badge passed">PASSED</span></td>
+          <td><span class="action-link disabled">N/A</span></td>
+          <td><span class="action-link disabled">N/A</span></td>
+          <td><button class="action-link trace" onclick="alert('Run: npx playwright show-trace &quot;../test-results/vwo-vwo-login-pf--P1-Regre-91585----Should-pass-successfully-chromium/trace.zip&quot;')">🔍 View</button></td>
+        </tr>
+        <tr class="failed" data-priority="P1" data-status="FAILED">
+          <td>2</td>
+          <td><span class="suite-tag">chromium</span></td>
+          <td class="test-name-cell">testFail - Should trigger intentional failure for retry and screenshot testing<span class="retry-badge">Retry 1</span></td>
+          <td>TTA-QA</td>
+          <td><span class="priority-tag p1">P1</span></td>
+          <td>P1, Regression, VWO, Login</td>
+          <td class="file-cell">vwo/vwo-login-pf.spec.ts</td>
+          <td class="time-cell">May 03, 2026, 18:31:00</td>
+          <td class="time-cell">May 03, 2026, 18:31:06</td>
+          <td class="duration-cell">0s</td>
+          <td><span class="status-badge failed">FAILED</span></td>
+          <td><span class="action-link disabled">N/A</span></td>
+          <td><span class="action-link disabled">N/A</span></td>
+          <td><button class="action-link trace" onclick="alert('Run: npx playwright show-trace &quot;../test-results/vwo-vwo-login-pf--P1-Regre-ed347-etry-and-screenshot-testing-chromium-retry1/trace.zip&quot;')">🔍 View</button></td>
+        </tr>
+        <tr class="passed" data-priority="P1" data-status="PASSED">
+          <td>3</td>
+          <td><span class="suite-tag">chromium</span></td>
+          <td class="test-name-cell">should display error for invalid credentials</td>
+          <td>TTA-QA</td>
+          <td><span class="priority-tag p1">P1</span></td>
+          <td>P1, Regression, VWO, Login</td>
+          <td class="file-cell">vwo/vwo-login-pf.spec.ts</td>
+          <td class="time-cell">May 03, 2026, 18:30:58</td>
+          <td class="time-cell">May 03, 2026, 18:31:51</td>
+          <td class="duration-cell">52s</td>
+          <td><span class="status-badge passed">PASSED</span></td>
+          <td><span class="action-link disabled">N/A</span></td>
+          <td><span class="action-link disabled">N/A</span></td>
+          <td><button class="action-link trace" onclick="alert('Run: npx playwright show-trace &quot;../test-results/vwo-vwo-login-pf--P1-Regre-66c2e-ror-for-invalid-credentials-chromium/trace.zip&quot;')">🔍 View</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function filterTable() {
+      const priorityChecks = document.querySelectorAll('input[data-filter="priority"]:checked');
+      const statusChecks = document.querySelectorAll('input[data-filter="status"]:checked');
+
+      const priorities = Array.from(priorityChecks).map(c => c.value);
+      const statuses = Array.from(statusChecks).map(c => c.value);
+
+      const rows = document.querySelectorAll('#resultsTable tbody tr');
+      rows.forEach(row => {
+        const rowPriority = row.dataset.priority;
+        const rowStatus = row.dataset.status;
+
+        const priorityMatch = priorities.includes('all') || priorities.includes(rowPriority);
+        const statusMatch = statuses.includes('all') || statuses.includes(rowStatus);
+
+        if (priorityMatch && statusMatch) {
+          row.classList.remove('hidden');
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

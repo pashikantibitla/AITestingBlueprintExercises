@@ -1,0 +1,1 @@
+export { VWOLoginModule } from './VWOLoginModule';

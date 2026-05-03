@@ -1,0 +1,22 @@
+{
+  "name": "playwright-migrated-framework",
+  "version": "1.0.0",
+  "description": "Migrated VWO test automation framework — Playwright + TypeScript",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:vwo": "playwright test --grep @VWO",
+    "test:vwo:headed": "playwright test --grep @VWO --headed",
+    "test:report": "playwright show-report",
+    "test:chromium": "playwright test --project=chromium",
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.4.0",
+    "typescript": "^5.9.0"
+  }
+}
