@@ -1,0 +1,6 @@
+
+    Account created successfully!TTA BankTTA BankDashboardTransfer FundsExpense TrackerTransactionsAI SupportSettingsEvan Jonestestuser_1777970078166@example.comSign OutDashboardTotal Balance$50,000.00 +2.5%from last monthMonthly Income$50,000Based on recent activityMonthly Expenses$315.48Total debit transactionsBalance HistoryThubalance : 48000MonTueWedThuFriSatSun$0k$15k$30k$45k$60kRecent ActivityView AllWhole Foods Market25/10/2023-$129.99Opening Deposit24/10/2023+$50000.00Netflix Subscription23/10/2023-$15.99Uber Ride22/10/2023-$24.50Quick Transfer
+  
+
+import '@/index';
+$0k

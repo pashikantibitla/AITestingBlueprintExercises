@@ -1,0 +1,19 @@
+{
+  "name": "exercise_01_login_vwo",
+  "version": "1.0.0",
+  "description": "Playwright CLI codegen exercise for VWO login flow with invalid credentials",
+  "main": "generated_login_test.spec.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "codegen": "npx playwright codegen https://app.vwo.com/#/login",
+    "report": "npx playwright show-report"
+  },
+  "keywords": ["playwright", "codegen", "vwo", "login", "testing"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

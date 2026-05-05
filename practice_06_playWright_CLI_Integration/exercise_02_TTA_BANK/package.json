@@ -1,0 +1,19 @@
+{
+  "name": "exercise_02_tta_bank",
+  "version": "1.0.0",
+  "description": "Playwright E2E tests for TTA Bank digital banking portal",
+  "main": "explore-page.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:validate": "npx playwright test --config=playwright.validation.config.js",
+    "report": "npx playwright show-report"
+  },
+  "keywords": ["playwright", "e2e", "tta-bank", "digital-banking", "testing"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

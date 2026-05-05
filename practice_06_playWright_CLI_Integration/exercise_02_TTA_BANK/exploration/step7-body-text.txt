@@ -1,0 +1,6 @@
+
+    TTA BankTTA BankDashboardTransfer FundsExpense TrackerTransactionsAI SupportSettingsEvan Jonestestuser_1777970078166@example.comSign OutTransfer FundsTransfer MoneyManage BeneficiariesFrom AccountSavings Account - 9938 (Available: $35,000)Current Account - 8821 (Available: $15,000)To BeneficiarySarah Smith (Chase) - 1234567890Landlord (Wells Fargo) - 0987654321Amount$Max available: $35,000Note (Optional)Continue
+  
+
+import '@/index';
+$0k

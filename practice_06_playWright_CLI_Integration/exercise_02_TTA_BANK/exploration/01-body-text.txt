@@ -1,0 +1,5 @@
+
+    TTA BankSecure Digital Banking PortalEmail AddressPasswordRemember meForgot password?Sign InDon't have an account? Sign Up© 2024 TTA Bank. All rights reserved. Authorized and Regulated by the Financial Conduct Authority.
+  
+
+import '@/index';
